@@ -66,13 +66,13 @@ Identify servers that may or may not be acting as Sliver command and control inf
 *** Run this script in a VM or behind a proxy as calls to unknown hosts will be made. *** 
 
 Examples:
-\t python sliver_venom.py -i IPADDRESS (single IP address)
-\t python sliver_venom.py -s Shodan Query for Default Sliver C2 HTTP Headers
+\t python sliver_venom.py -i IP address to match against JARM hashes (single IP address)
+\t python sliver_venom.py -s Shodan query for default  Sliver C2 HTTP Headers
 
 JARM Hashes: 
-\t Default: 28d28d28d00028d00043d28d28d43d47390d982d099a542ccbc90628951062
+\t Default:     28d28d28d00028d00043d28d28d43d47390d982d099a542ccbc90628951062
 \t Go V 1.16.7: 2ad2ad0002ad2ad00043d2ad2ad43da5207249a18099be84ef3c8811adc883
-\t Go V 1.17: 2ad2ad00000000000043d2ad2ad43dc4b09cccb7c1d19522df9b67bf57f4fb
+\t Go V 1.17:   2ad2ad00000000000043d2ad2ad43dc4b09cccb7c1d19522df9b67bf57f4fb
 """
 
     parser = argparse.ArgumentParser(
