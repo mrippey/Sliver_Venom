@@ -1,6 +1,6 @@
 import argparse
 import asyncio
-from dotenv import load_dotenv
+from datetime import datetime, timedelta
 from jarm.scanner.scanner import Scanner
 import os 
 import shodan
@@ -17,30 +17,41 @@ def search_jarm_hashes(target, port=443):
 
     for jarm_hash in result:
         if jarm_hash in jarm_hashes:
-            print(f'Hash: {jarm_hash} matched your query!')
+            return f'Hash: {jarm_hash} matched your query!'
         else:
-            print("""The server you are looking for may not yet a have a JARM hash.
-            Try a Shodan search...""") 
+            return """The server you are looking for may not yet a have a JARM hash.
+            Try a Shodan search..."""
 
 
-def shodan_query_default_headers():
+def query_shodan_api(SHODAN_API_KEY):
+     print('Completing Shodan query...\n')
+    
+    """Connect to Shodan API and return hardcoded search query for default HTTP headers 
+    
+    Args: None   
+    
+    Returns: [str] of IP addresses"""       
+    
+    yesterday = datetime.now() - timedelta(days=7)
+    formatted_date = datetime.strftime(yesterday, '%Y-%m-%d')
 
-    load_dotenv()
-
-    SHODAN_API = os.getenv('SHODAN_API_KEY')
-
-    api = shodan.Shodan(SHODAN_API)
+    api = shodan.Shodan(SHODAN_API_KEY)
 
     shodan_query = '"HTTP/1.1 404 Not Found" "Cache-Control: no-store, no-cache, must-revalidate" "Content-Type: application/octet-stream" "X-Powered-By: PHP/" "Server: Apache/"'
 
     try:
         shodan_results = api.search(shodan_query)
 
-        print(f'Results returned: {shodan_results["total"]}')
+        print(f'Total results: {shodan_results["total"]} \nMost recent below:\n')
         print()
 
-        for idx, shodan_output in enumerate(shodan_results['matches'][:], start=1):
-            print(f'{idx}. IP Address: {shodan_output["ip_str"]}')
+        for idx, shodan_output in enumerate(shodan_results['matches'][:]):
+                        
+            test = shodan_output['timestamp'].split('T')
+            
+            if formatted_date in test:
+                        
+                print(f'{idx}. {shodan_output["ip_str"]}')
                      
     except shodan.APIError as err:
         print(f'Error: {err}')
@@ -79,8 +90,9 @@ JARM Hashes:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=menu,
     )
-    parser.add_argument("-i", "--ipaddr", help="Name of group to lookup")
-    parser.add_argument("-s", "--shodan_token", help="Return all records")
+            
+    parser.add_argument("-i", "--ipaddr", help="IP address to scan for JARM matches")
+    parser.add_argument("-s", "--shodan_token", help="Shodan search for default Sliver HTTP headers")
 
     args = parser.parse_args()
 
@@ -92,7 +104,7 @@ JARM Hashes:
             print(err)
     elif args.shodan_token:
         print(menu)
-        shodan_query_default_headers(args.shodan_token)  
+        query_shodan_api(args.shodan_token)  
     else:
         print(menu)
 
