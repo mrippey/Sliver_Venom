@@ -32,12 +32,12 @@ def query_shodan_api(SHODAN_API_KEY):
     
     Returns: [str] of IP addresses"""       
     
-    yesterday = datetime.now() - timedelta(days=7)
-    formatted_date = datetime.strftime(yesterday, '%Y-%m-%d')
+    recent_results = datetime.now() - timedelta(days=2)
+    formatted_date = datetime.strftime(recent_results, '%Y-%m-%d')
 
     api = shodan.Shodan(SHODAN_API_KEY)
 
-    shodan_query = '"HTTP/1.1 404 Not Found" "Cache-Control: no-store, no-cache, must-revalidate" "Content-Type: application/octet-stream" "X-Powered-By: PHP/" "Server: Apache/"'
+    shodan_query = """HTTP/1.1 404 Not Found" "Cache-Control: no-store, no-cache, must-revalidate" "Content-Type: application/octet-stream" "X-Powered-By: PHP/" "Server: Apache/"""
 
     try:
         shodan_results = api.search(shodan_query)
@@ -47,14 +47,14 @@ def query_shodan_api(SHODAN_API_KEY):
 
         for idx, shodan_output in enumerate(shodan_results['matches'][:]):
                         
-            test = shodan_output['timestamp'].split('T')
+            get_timestamp = shodan_output['timestamp'].split('T')
             
-            if formatted_date in test:
+            if formatted_date in get_timestamp:
                         
                 print(f'{idx}. {shodan_output["ip_str"]}')
                      
     except shodan.APIError as err:
-        print(f'Error: {err}')
+        print(err)
 
   
 def main():
